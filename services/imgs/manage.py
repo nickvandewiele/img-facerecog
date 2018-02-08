@@ -1,4 +1,5 @@
 # users-service/manage.py
+import os
 import csv
 import unittest
 from flask_script import Manager
@@ -27,34 +28,31 @@ def test():
 
 @manager.command
 def seed_db():
-    """Seeds the database."""
-    db.session.add(Image(path='F:/Pictures/2011-07/IMG_0024.JPG'))
-    db.session.add(Image(path='F:/Pictures/2011-06/IMG_0002.JPG'))
+    """Seeds the database with 2 images."""
+    db.session.add(Image(path=os.path.join('project', 'examples', 'connie.jpg')))
+    db.session.add(Image(path=os.path.join('project', 'examples', 'NicksParty-50.jpg')))
     db.session.commit()
 
 @manager.command
-def seed_csv():
-    """Seeds the database with the csv."""
+def load_examples():
+    '''Seeds the database with all the images found in the project/examples/* folder.'''
+    imgs = {}
 
-    imgs = load_csv_into_dict('imgs.csv')
+    walk_dir = os.path.join('project', 'examples')
+    assert os.path.isdir(walk_dir)
+
+    imgid = 0
+    for root, subdirs, files in os.walk(walk_dir):
+        for filename in files:
+            file_path = os.path.join(root, filename)
+            _, ext = os.path.splitext(file_path)
+            if ext.lower() in ['.jpg', '.png']:
+                imgs[imgid] = file_path
+                imgid += 1    
+
     for k, fpath in imgs.items():
         db.session.add(Image(path=fpath))
     db.session.commit()
-
-
-def load_csv_into_dict(fpath):
-    imgs = {}
-    with open(fpath, 'r', errors='ignore') as f:
-        reader = csv.reader(f)
-        next(reader)  # Skip the header row.
-
-        for row in reader:  
-            imgid, imgpath = row[0], row[1:]
-            imgpath = ','.join(imgpath)
-            print(imgpath)
-            imgs[imgid] = imgpath
-
-    return imgs
 
 if __name__ == '__main__':
     manager.run()
