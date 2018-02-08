@@ -22,6 +22,10 @@
         <h1>All Images</h1>
         <hr>
 
+        <form action="/" method="POST">
+          <input type="submit" class="btn btn-primary btn-lg btn-block" value="Recognize">
+        </form>
+        <hr>
         <table class="table table-dark">
           <thead>
             <tr>
@@ -32,13 +36,13 @@
           </thead>
           <tbody>
             {% if images %}
-              {% for image in images %}
-              <tr>
-                <th scope="row">{{image.id}}</th>
-                <td>{{image.path}}</td>
-                <td>{{image.names}}</td>
-              </tr>
-              {% endfor %}
+            {% for image in images %}
+            <tr>
+              <th scope="row">{{image.id}}</th>
+              <td>{{image.path}}</td>
+              <td>{{image.names}}</td>
+            </tr>
+            {% endfor %}
             {% else %}
             <p>No images!</p>
             {% endif %}

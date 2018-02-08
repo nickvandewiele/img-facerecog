@@ -74,5 +74,51 @@ class TestImageService(BaseTestCase):
             self.assertIn(b'NicksParty-50', response.data)
             self.assertIn(b'Foo', response.data)
 
+    def test_main_post(self):
+        """Ensure a post on the main page leads to a new entry in the database."""
+        dummy_path = os.path.join('project', 'examples', 'Foo.jpg')
+        with self.client:
+            response = self.client.post(
+                '/images',
+                data=json.dumps({
+                    'path': dummy_path,
+                    'names': 'Foo'
+                }),
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            self.assertIn('{} was added!'.format(dummy_path), data['message'])
+            self.assertIn('success', data['status'])
+
+    def test_update_record(self):
+        '''Ensure that a record can be updated in the database.'''
+
+        # add image without a name
+        dummy_path = os.path.join('project', 'examples', 'Foo.jpg')
+        img1 = add_image(dummy_path)
+
+        # post the same image path, but add a name now.
+        with self.client:
+            response = self.client.post(
+                '/images',
+                data=json.dumps({
+                    'path': dummy_path,
+                    'names': 'Foo'
+                }),
+                content_type='application/json',
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 201)
+            self.assertIn('{} was updated!'.format(dummy_path), data['message'])
+            self.assertIn('success', data['status'])
+
+            # check if the Image object in the database contains the expected name
+            img2 = Image.query.filter_by(path=dummy_path).first()
+            self.assertEqual(img2.names, 'Foo')
+
+
+
 if __name__ == '__main__':
     unittest.main()    

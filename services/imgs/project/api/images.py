@@ -18,10 +18,12 @@ def ping_pong():
         'message': 'pong!'
     })
 
-
 @imgs_blueprint.route('/', methods=['GET'])
 def index():
-    '''Show all the images in the database.'''
+    '''
+    GET: Show all the images in the database.
+    '''
+
     images = Image.query.all()
     return render_template('index.html', images=images)
 
@@ -52,3 +54,62 @@ def recognize_img(img_id):
             }
         }
         return jsonify(response_object), 200
+
+
+@imgs_blueprint.route('/images', methods=['POST'])
+def add_image():
+    '''
+    POST: add new image to the database.
+    
+    If the path of the image already exists in the database, only overwrite if 
+    a name is added to the record.
+
+    '''    
+
+    post_data = request.get_json()
+    response_object = {
+        'status': 'fail',
+        'message': 'Invalid payload'
+    }
+
+    if not post_data:
+        return jsonify(response_object), 400
+
+
+    path = post_data.get('path')
+    names = post_data.get('names')
+
+    try:
+        image = Image.query.filter_by(path=path).first()
+        if not image:
+            db.session.add(Image(path=path, names=names))
+            db.session.commit()
+
+            response_object = {
+                        'status': 'success',
+                        'message': f'{path} was added!'
+                    }
+            return jsonify(response_object), 201        
+        else:
+
+            if image.names is not None:
+                response_object['message'] = 'Sorry. That image already exists.'
+                return jsonify(response_object), 400
+            elif names:
+                image.names = names
+                db.session.commit()
+
+                response_object = {
+                            'status': 'success',
+                            'message': f'{path} was updated!'
+                        }
+                return jsonify(response_object), 201
+            else:
+                response_object['message'] = 'Name was not contained in payload.'
+                return jsonify(response_object), 400
+
+    except exc.IntegrityError as e:
+        db.session.rollback()
+        return jsonify(response_object), 400
+
+    
