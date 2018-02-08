@@ -1,49 +1,67 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Flask on Docker</title>
-    <!-- meta -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <!-- styles -->
-    <link
-      href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
-      rel="stylesheet"
-    >
-    {% block css %}{% endblock %}
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4">
-          <br>
-          <h1>All Images</h1>
-          <hr>
+<head>
+  <meta charset="utf-8">
+  <title>Flask on Docker</title>
+  <!-- meta -->
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- styles -->
+  <link
+  href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+  rel="stylesheet"
+  >
+  {% block css %}{% endblock %}
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <br>
+        <h1>All Images</h1>
+        <hr>
+
+        <table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Path</th>
+              <th scope="col">Recognized names</th>
+            </tr>
+          </thead>
+          <tbody>
             {% if images %}
-              <ol>
-                {% for image in images %}
-                  <li>{{image.path}}</li>
-                {% endfor %}
-              </ol>
+            {% for image in images %}
+            <tr>
+              <th scope="row">{{image.id}}</th>
+              <td>{{image.path}}</td>
+              <td>NA</td>
+            </tr>
+
+            {% endfor %}
             {% else %}
-              <p>No images!</p>
+            <p>No images!</p>
             {% endif %}
-          </div>
-        </div>
+
+          </tbody>
+        </table>
+
+
       </div>
     </div>
-    <!-- scripts -->
-    <script
-      type="text/javascript"
-      src="//code.jquery.com/jquery-2.2.4.min.js"
-    ></script>
-    <script
-      type="text/javascript"
-      src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"
-    >
-    </script>
-    {% block js %}{% endblock %}
-  </body>
+  </div>
+</div>
+<!-- scripts -->
+<script
+type="text/javascript"
+src="//code.jquery.com/jquery-2.2.4.min.js"
+></script>
+<script
+type="text/javascript"
+src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"
+>
+</script>
+{% block js %}{% endblock %}
+</body>
 </html>
