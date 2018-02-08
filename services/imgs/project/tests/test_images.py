@@ -74,7 +74,7 @@ class TestImageService(BaseTestCase):
             self.assertIn(b'Foo', response.data)
             self.assertIn(b'Foo', response.data)
 
-    def test_main_post(self):
+    def test_images_post(self):
         """Ensure a post on the main page leads to a new entry in the database."""
         dummy_path = os.path.join('project', 'examples', 'Foo.jpg')
         with self.client:
@@ -118,7 +118,27 @@ class TestImageService(BaseTestCase):
             img2 = Image.query.filter_by(path=dummy_path).first()
             self.assertEqual(img2.names, 'Foo')
 
+    def test_main_post(self):
+        '''Ensure that a post with no data on the main page updates the database,
+        if needed.'''
 
+        # add an image to the database in which 2 faces are recognized
+        dummy_path = os.path.join('project', 'examples', 'NicksParty-50.jpg')
+        image = add_image(dummy_path)
+
+        # post to the main route and see if the view gets updated with the identified names
+        with self.client:
+            response = self.client.post(
+                '/',
+                data=json.dumps({}),
+                content_type='application/json',
+            )
+            self.assertEqual(response.status_code, 200)
+
+            # check if the record now has the expected names
+            img = Image.query.filter_by(path=dummy_path).first()
+            for name in ['IYun Hsieh', 'Perman Jo']:
+                self.assertIn(name, img.names)
 
 if __name__ == '__main__':
     unittest.main()    

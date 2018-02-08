@@ -18,12 +18,41 @@ def ping_pong():
         'message': 'pong!'
     })
 
-@imgs_blueprint.route('/', methods=['GET'])
+@imgs_blueprint.route('/', methods=['GET', 'POST'])
 def index():
     '''
     GET: Show all the images in the database.
+    POST: runs the recognize operation on all the images in the database
+    that do not have values in the names column.
     '''
+    if request.method == 'POST':
+        try:
+            for img in Image.query.all():
+                print('Working on path: {}'.format(img.path))
+                if not img.names:
+                    names = []
+                    img_path = os.path.abspath(img.path)
+                    assert os.path.isfile(img_path), 'Could not find image path: {}'.format(img_path)
 
+                    data = recognize(img_path)
+                    # data is a list of dictionaries
+                    if data:
+                        names = list(map(lambda d: d['name'], data))
+                        img.names = ','.join(names)
+                    else:
+                        # no recognized names, leave the names column empty
+                        pass
+                else:
+                    # record already contains names. Not updating record.
+                    pass
+                    
+            db.session.commit()    
+
+        except exc.IntegrityError as e:
+            db.session.rollback()
+            return jsonify(response_object), 400
+        
+    
     images = Image.query.all()
     return render_template('index.html', images=images)
 
