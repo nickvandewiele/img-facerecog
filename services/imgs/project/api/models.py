@@ -3,7 +3,7 @@ from project import db
 class Image(db.Model):
     __tablename__ = "images"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    path = db.Column(db.String(128), nullable=False)
+    path = db.Column(db.String(512), nullable=False)
 
     def __init__(self, path):
         self.path = path

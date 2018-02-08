@@ -1,5 +1,5 @@
 # users-service/manage.py
-
+import csv
 import unittest
 from flask_script import Manager
 
@@ -31,6 +31,30 @@ def seed_db():
     db.session.add(Image(path='F:/Pictures/2011-07/IMG_0024.JPG'))
     db.session.add(Image(path='F:/Pictures/2011-06/IMG_0002.JPG'))
     db.session.commit()
-    
+
+@manager.command
+def seed_csv():
+    """Seeds the database with the csv."""
+
+    imgs = load_csv_into_dict('imgs.csv')
+    for k, fpath in imgs.items():
+        db.session.add(Image(path=fpath))
+    db.session.commit()
+
+
+def load_csv_into_dict(fpath):
+    imgs = {}
+    with open(fpath, 'r', errors='ignore') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the header row.
+
+        for row in reader:  
+            imgid, imgpath = row[0], row[1:]
+            imgpath = ','.join(imgpath)
+            print(imgpath)
+            imgs[imgid] = imgpath
+
+    return imgs
+
 if __name__ == '__main__':
     manager.run()
