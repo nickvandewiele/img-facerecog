@@ -1,0 +1,3 @@
+CREATE DATABASE imgs_prod;
+CREATE DATABASE imgs_dev;
+CREATE DATABASE imgs_test;

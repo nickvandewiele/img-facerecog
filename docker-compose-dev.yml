@@ -1,0 +1,43 @@
+version: '3.3'
+
+services:
+
+  imgs-service:
+    container_name: imgs-service
+    build:
+      context: ./services/imgs
+      dockerfile: Dockerfile-dev
+    volumes:
+      - './services/imgs:/usr/src/app'
+    ports:
+      - 5001:5000
+    environment:
+      - APP_SETTINGS=project.config.DevelopmentConfig
+      - DATABASE_URL=postgres://postgres:postgres@imgs-db:5432/imgs_dev
+      - DATABASE_TEST_URL=postgres://postgres:postgres@imgs-db:5432/imgs_test
+    depends_on:
+      - imgs-db
+    links:
+      - imgs-db
+
+  imgs-db:
+    container_name: imgs-db
+    build:
+      context: ./services/imgs/project/db
+      dockerfile: Dockerfile
+    ports:
+      - 5435:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  nginx:
+    container_name: nginx
+    build: ./services/nginx/
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - imgs-service
+    links:
+      - imgs-service

@@ -1,2 +1,0 @@
-fbrecog==1.6
-psycopg2
