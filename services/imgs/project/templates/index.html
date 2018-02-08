@@ -32,14 +32,13 @@
           </thead>
           <tbody>
             {% if images %}
-            {% for image in images %}
-            <tr>
-              <th scope="row">{{image.id}}</th>
-              <td>{{image.path}}</td>
-              <td>NA</td>
-            </tr>
-
-            {% endfor %}
+              {% for image in images %}
+              <tr>
+                <th scope="row">{{image.id}}</th>
+                <td>{{image.path}}</td>
+                <td>{{image.names}}</td>
+              </tr>
+              {% endfor %}
             {% else %}
             <p>No images!</p>
             {% endif %}

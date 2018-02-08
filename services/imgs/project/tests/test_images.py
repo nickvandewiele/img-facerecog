@@ -8,8 +8,8 @@ from project.api.models import Image
 from project.tests.base import BaseTestCase
 
 
-def add_image(fpath):
-    image = Image(path=fpath)
+def add_image(fpath, names=None):
+    image = Image(path=fpath, names=names)
     db.session.add(image)
     db.session.commit()
     return image
@@ -60,6 +60,19 @@ class TestImageService(BaseTestCase):
             self.assertNotIn(b'<p>No images!</p>', response.data)
             self.assertIn(b'NicksParty-50', response.data)
             self.assertIn(b'IMG_2755', response.data)
+
+    def test_main_with_images_with_names(self):
+        """Ensure the main route behaves correctly when image with an
+        associated name has been added to the database."""
+        img1 = add_image(os.path.join('project', 'examples', 'NicksParty-50.jpg'), names='Foo')
+
+        with self.client:
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'<h1>All Images</h1>', response.data)
+            self.assertNotIn(b'<p>No images!</p>', response.data)
+            self.assertIn(b'NicksParty-50', response.data)
+            self.assertIn(b'Foo', response.data)
 
 if __name__ == '__main__':
     unittest.main()    
