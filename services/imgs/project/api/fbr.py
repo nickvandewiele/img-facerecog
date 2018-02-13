@@ -40,5 +40,8 @@ def recognize(img_path):
 
     assert os.path.isfile(img_path), 'Could not find image file: {}'.format(img_path)
 
-    return FBRecog(access_token, cookie, fb_dtsg).recognize(img_path)
-    
+    try:
+        return FBRecog(access_token, cookie, fb_dtsg).recognize(img_path)
+    except TypeError:
+        print('Could not recognize names for {}'.format(img_path))
+        return None

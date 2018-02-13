@@ -3,9 +3,11 @@ import os
 import csv
 import unittest
 from flask_script import Manager
+from sqlalchemy import exc
 
 from project import create_app, db
 from project.api.models import Image
+from project.api.fbr import recognize
 
 app = create_app()
 manager = Manager(app)
@@ -53,6 +55,36 @@ def load_examples():
     for k, fpath in imgs.items():
         db.session.add(Image(path=fpath))
     db.session.commit()
+
+@manager.command
+def recognize_ex():
+    ''' Iterate over database images, and make call to the FB recognize API, if no
+    names have been found.'''
+
+    imgs = Image.query.all()
+
+    imgs = list(filter(lambda img: img.names is None, imgs))
+
+    print('No. of images to be tagged: {}'.format(len(imgs)))
+    try:
+        for img in imgs:
+            img_path = os.path.abspath(img.path)
+            print(img_path)
+            assert os.path.isfile(img_path), 'Could not find image path: {}'.format(img_path)
+
+            resp = recognize(img_path)
+
+            if resp:
+                names = list(map(lambda d: d['name'], resp))
+                print('Identified names: {}'.format(names))
+                img.names = ','.join(names)            
+            else:
+                print('No recognized names for {}'.format(img_path))
+                pass
+        db.session.commit()
+ 
+    except exc.IntegrityError as e:
+        db.session.rollback()
 
 if __name__ == '__main__':
     manager.run()
