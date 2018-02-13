@@ -27,7 +27,7 @@ class TestImageService(BaseTestCase):
 
     def test_recognize(self):
         """Ensure get single image recognized behaves correctly."""
-        image = add_image(os.path.join('project', 'examples', 'NicksParty-50.jpg'))
+        image = add_image(os.path.join('project', 'tests', 'data', 'Foo.jpg'))
         with self.client:
             response = self.client.get(f'/recognize/{image.id}')
             data = json.loads(response.data.decode())
@@ -49,8 +49,8 @@ class TestImageService(BaseTestCase):
     def test_main_with_images(self):
         """Ensure the main route behaves correctly when images have been
     added to the database."""
-        img1 = add_image(os.path.join('project', 'examples', 'Foo.jpg'))
-        img2 = add_image(os.path.join('project', 'examples', 'Bar.jpg'))
+        img1 = add_image(os.path.join('project', 'tests', 'data', 'Foo.jpg'))
+        img2 = add_image(os.path.join('project', 'tests', 'data', 'Bar.jpg'))
 
         with self.client:
             response = self.client.get('/')
@@ -62,7 +62,7 @@ class TestImageService(BaseTestCase):
         associated name has been added to the database, and queried via the form."""
         
         # add image
-        img1 = add_image(os.path.join('project', 'examples', 'Foo.jpg'), names='Foo')
+        img1 = add_image(os.path.join('project', 'tests', 'data', 'Foo.jpg'), names='Foo')
 
         with self.client:
             # query name
@@ -71,7 +71,7 @@ class TestImageService(BaseTestCase):
                 data=dict(name='Foo'),
                 follow_redirects=True
                 )
-            
+
             self.assertEqual(response.status_code, 200)
             self.assertIn(b'<h1>All Images</h1>', response.data)
             self.assertNotIn(b'<p>No images!</p>', response.data)
@@ -80,7 +80,7 @@ class TestImageService(BaseTestCase):
 
     def test_images_post(self):
         """Ensure a post on the main page leads to a new entry in the database."""
-        dummy_path = os.path.join('project', 'examples', 'Foo.jpg')
+        dummy_path = os.path.join('project', 'tests', 'data', 'Foo.jpg')
         with self.client:
             response = self.client.post(
                 '/images',
@@ -99,7 +99,7 @@ class TestImageService(BaseTestCase):
         '''Ensure that a record can be updated in the database.'''
 
         # add image without a name
-        dummy_path = os.path.join('project', 'examples', 'Foo.jpg')
+        dummy_path = os.path.join('project', 'tests', 'data', 'Foo.jpg')
         img1 = add_image(dummy_path)
 
         # post the same image path, but add a name now.
