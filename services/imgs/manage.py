@@ -65,21 +65,21 @@ def recognize_ex():
 
     imgs = list(filter(lambda img: img.names is None, imgs))
 
-    print('No. of images to be tagged: {}'.format(len(imgs)))
+    app.logger.info('No. of images to be tagged: {}'.format(len(imgs)))
     try:
         for img in imgs:
             img_path = os.path.abspath(img.path)
-            print(img_path)
+            app.logger.info('Tagging: {}'.format(img_path))
             assert os.path.isfile(img_path), 'Could not find image path: {}'.format(img_path)
 
             resp = recognize(img_path)
 
             if resp:
                 names = list(map(lambda d: d['name'], resp))
-                print('Identified names: {}'.format(names))
+                app.logger.info('Identified names: {}'.format(names))
                 img.names = ','.join(names)            
             else:
-                print('No recognized names for {}'.format(img_path))
+                app.logger.info('No recognized names for {}'.format(img_path))
                 pass
         db.session.commit()
  
